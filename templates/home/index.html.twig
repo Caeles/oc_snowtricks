@@ -80,6 +80,7 @@
                                 <div class="d-flex justify-content-between align-items-center mt-3">
                                     <a href="{{ path('app_trick_show', {'slug': trick.slug}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
                                     <div>
+                                    <!-- si l'utilisateur est connecté et que l'utilisateur est le propriétaire du trick alors il pourra supprimer ou éditer le trick -->
                                         {% if is_granted('IS_AUTHENTICATED_FULLY') and app.user.id == trick.author.id %}
                                             <a href="{{ path('app_trick_edit', {'slug': trick.slug}) }}" class="text-primary me-2"><i class='bx bx-edit'></i></a>
                                             <a href="{{ path('app_trick_delete', {'slug': trick.slug}) }}" class="text-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer?')"><i class='bx bx-trash'></i></a>

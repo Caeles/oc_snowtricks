@@ -127,6 +127,7 @@
 
                     {% if comments|length > 0 %}
                         <h3 class="h5 mb-4">{{ totalComments }} commentaire{% if totalComments > 1 %}s{% endif %}</h3>
+                        {# Pour chaque commentaire, le nom de l'auteur, la photo, la date de création du message et le message doivent être affichés. #}
                         {% for comment in comments %}
                             <div class="comment mb-4 p-3 border-bottom">
                                 <div class="d-flex">

@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\ResetPassword;
-use App\Form\UserForm;
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\ResetPasswordRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +25,7 @@ final class SecurityController extends AbstractController
     public function signup(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
         $user = new User();
-        $userForm = $this->createForm(UserForm::class, $user);
+        $userForm = $this->createForm(UserType::class, $user);
         $userForm->handleRequest($request);
         if ($userForm->isSubmitted() && $userForm->isValid()) {
             $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));

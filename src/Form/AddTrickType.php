@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\File;
 
-class AddTrickForm extends AbstractType
+class AddTrickType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -26,7 +26,7 @@ class AddTrickForm extends AbstractType
             ->add('title', TextType::class, [
                 'label' => 'Nom du trick',
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer un nom pour le trick']),
+                    new NotBlank(['message' => 'Veuillez entrer le nom du trick']),
                     new Length([
                         'min' => 3,
                         'max' => 255,

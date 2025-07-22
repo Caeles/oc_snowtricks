@@ -15,7 +15,8 @@ final class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(TrickRepository $trickRepository): Response
     {
-        $tricks = $trickRepository->findBy([], ['createdAt' => 'DESC'], 9);
+        // un minimum de 10 tricks doivent être affichés
+        $tricks = $trickRepository->findBy([], ['createdAt' => 'DESC'], 10);
         
         return $this->render('home/index.html.twig', [
             'tricks' => $tricks,
