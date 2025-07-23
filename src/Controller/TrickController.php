@@ -132,7 +132,7 @@ class TrickController extends AbstractController
                 'slug' => $trick->getSlug(),
             ]);
         }
-        
+
         return $this->render('trick/edit.html.twig', [
             'trick' => $trick,
             'form' => $form->createView(),

@@ -34,10 +34,7 @@
                                         <div class="card-body">
                                             <p class="card-text small text-muted">{{ image.filename }}</p>
                                             <div class="text-end">
-                                                <form method="post" action="{{ path('app_image_delete', {'id': image.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette image ?');">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ image.id) }}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
-                                                </form>
+                                                <a href="#" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteImageModal{{ image.id }}">Supprimer</a>
                                             </div>
                                         </div>
                                     </div>
@@ -65,10 +62,7 @@
                                             </div>
                                             <p class="card-text small text-truncate text-muted">{{ video.url }}</p>
                                             <div class="text-end">
-                                                <form method="post" action="{{ path('app_video_delete', {'id': video.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette vidéo ?');">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ video.id) }}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
-                                                </form>
+                                                <a href="#" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal{{ video.id }}">Supprimer</a>
                                             </div>
                                         </div>
                                     </div>
@@ -93,5 +87,58 @@
         </div>
     </div>
 </section>
+
+{# Modales de confirmation pour suppression d'images #}
+{% for image in trick.images %}
+<div class="modal fade" id="deleteImageModal{{ image.id }}" tabindex="-1" aria-labelledby="deleteImageModalLabel{{ image.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteImageModalLabel{{ image.id }}">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette image ?</p>
+                <img src="/images/tricks/{{ image.filename }}" class="img-fluid mb-3" alt="{{ image.altText }}" style="max-height: 200px; width: auto;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_image_delete', {'id': image.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ image.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{# Modales de confirmation pour suppression de vidéos #}
+{% for video in trick.videos %}
+<div class="modal fade" id="deleteVideoModal{{ video.id }}" tabindex="-1" aria-labelledby="deleteVideoModalLabel{{ video.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteVideoModalLabel{{ video.id }}">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette vidéo ?</p>
+                <div class="ratio ratio-16x9 mb-3">
+                    <iframe src="{{ video.url|replace({'watch?v=': 'embed/'}) }}" allowfullscreen></iframe>
+                </div>
+                <p class="small text-muted">{{ video.url }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_video_delete', {'id': video.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ video.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% endblock %}
