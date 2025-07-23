@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\All;
 
 class AddTrickType extends AbstractType
 {
@@ -51,15 +52,16 @@ class AddTrickType extends AbstractType
                 'mapped' => false,
                 'multiple' => true, 
                 'constraints' => [
-                    // protection des  uploads de fichiers
-                    new File([
-                        'maxSize' => '5M',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                            'image/gif'
-                        ],
-                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPEG, PNG, GIF)'
+                    new All([
+                        new File([
+                            'maxSize' => '5M',
+                            'mimeTypes' => [
+                                'image/jpeg',
+                                'image/png',
+                                'image/gif'
+                            ],
+                            'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPEG, PNG, GIF)'
+                        ])
                     ])
                 ]
             ])

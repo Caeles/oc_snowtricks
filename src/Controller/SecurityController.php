@@ -25,43 +25,54 @@ final class SecurityController extends AbstractController
     #[Route('/signup', name: 'signup')]
     public function signup(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
+        if (!$request->isMethod('POST')) {
+            $user = new User();
+            $userForm = $this->createForm(UserType::class, $user);
+            
+            return $this->render('security/signup.html.twig', [
+                'form' => $userForm->createView(),
+            ]);
+        }
+        
         $user = new User();
         $userForm = $this->createForm(UserType::class, $user);
         $userForm->handleRequest($request);
-        if ($userForm->isSubmitted() && $userForm->isValid()) {
-            //hachage du mot de passe avec $passwordHasher
-            $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-            
-            try {
-                $em->persist($user);
-                $em->flush();
-                $email = new TemplatedEmail();
-            $email->subject('Bienvenue sur Snowtricks!')
-                  ->from('snowtricks@demomailtrap.co')
-                  ->to($user->getEmail())
-                  ->text('Nous sommes ravis de vous avoir sur Snowtricks !')
-                  ->htmlTemplate('email/welcome.html.twig')
-                  ->context([
-                      'user' => $user,
-                  ]);
-            $mailer->send($email);
         
-            $this->addFlash('success', 'Bienvenue sur Snowtricks !');
-            return $this->redirectToRoute('login');
-            } catch (\PDOException $e) {
-            
-                if (str_contains($e->getMessage(), 'Duplicate entry') && str_contains($e->getMessage(), 'email')) {
-                    $this->addFlash('error', 'Cette adresse email est déjà utilisée. Veuillez en choisir une autre ou vous connecter.');
-                } else {
-                    $this->addFlash('error', 'Une erreur est survenue lors de la création du compte. Veuillez réessayer.');
-                }
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur inattendue est survenue. Veuillez réessayer plus tard.');
+        if (!$userForm->isValid()) {
+            foreach ($userForm->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
             }
+            return $this->redirectToRoute('signup');
         }
-        return $this->render('security/signup.html.twig', [
-            'form' => $userForm->createView(),
-        ]);
+        
+        //hachage du mot de passe
+        $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
+        
+        try {
+            // persister l'utilisateur
+            $em->persist($user);
+            $em->flush();
+            
+            // envoi de l'email de bienvenue (sans bloquer l'inscription)
+            $this->sendWelcomeEmail($user, $mailer);
+            
+            $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+            return $this->redirectToRoute('login');
+            
+        } catch (\PDOException $e) {
+            // gestion des erreurs de base de données
+            if (str_contains($e->getMessage(), 'Duplicate entry') && str_contains($e->getMessage(), 'email')) {
+                $this->addFlash('error', 'Cette adresse email est déjà utilisée.');
+            } else {
+                $this->addFlash('error', 'Une erreur est survenue lors de l\'enregistrement.');
+            }
+            
+            return $this->redirectToRoute('signup');
+            
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur inattendue est survenue.');
+            return $this->redirectToRoute('signup');
+        }
     }
 
     #[Route('/login', name: 'login')]
@@ -72,7 +83,6 @@ final class SecurityController extends AbstractController
         }
         $error = $authenticationUtils->getLastAuthenticationError();
         $username = $authenticationUtils->getLastUsername();
-        
         
         if ($error) {
             if ($error instanceof \Symfony\Component\Security\Core\Exception\UserNotFoundException) {
@@ -90,6 +100,25 @@ final class SecurityController extends AbstractController
             'username' => $username,
             'controller_name' => 'SecurityController',
         ]);
+    }
+
+    private function sendWelcomeEmail(User $user, MailerInterface $mailer): void
+    {
+        try {
+            $email = new TemplatedEmail();
+            $email->subject('Bienvenue sur Snowtricks!')
+                  ->from('snowtricks@demomailtrap.co')
+                  ->to($user->getEmail())
+                  ->text('Nous sommes ravis de vous avoir sur Snowtricks !')
+                  ->htmlTemplate('email/welcome.html.twig')
+                  ->context([
+                      'user' => $user,
+                  ]);
+            
+            $mailer->send($email);
+        } catch (\Exception $e) {
+            
+        }
     }
 
     #[Route('/logout', name: 'logout')]

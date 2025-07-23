@@ -31,7 +31,7 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException('Trick non trouvé');
         }
         
-  //récupération du numéro de page depuis la requête, 1 par défaut si pas de page
+//récupération du numéro de page depuis la requête, 1 par défaut si pas de page
         $page = $request->query->getInt('page', 1);
 //lecture de 10 commentaires par page
         $commentData = $commentRepository->findCommentsByTrick($trick, $page, 10);
@@ -78,6 +78,9 @@ class TrickController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Ajouter un message flash pour confirmer la soumission du formulaire
+            $this->addFlash('info', 'DEBUG: Formulaire soumis et valide'); 
+            
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
                 $newFilename = md5(uniqid()) . '.' . $imageFile->guessExtension();
@@ -117,9 +120,14 @@ class TrickController extends AbstractController
                 $entityManager->persist($video);
             }
             
+            // Assurons-nous que les modifications du trick sont persistées
             $entityManager->persist($trick);
             $entityManager->flush();
+            
+            // Ajoutons un message de confirmation
+            $this->addFlash('success', 'Les modifications ont été enregistrées avec succès');
 
+            // Redirigeons vers la page du trick
             return $this->redirectToRoute('app_trick_show', [
                 'slug' => $trick->getSlug(),
             ]);

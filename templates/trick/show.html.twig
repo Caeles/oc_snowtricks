@@ -12,7 +12,10 @@
                     <div>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') and app.user.id == trick.author.id %}
                             <a href="{{ path('app_trick_edit', {'slug': trick.slug}) }}" class="btn btn-sm btn-outline-primary me-2">Modifier</a>
-                            <a href="{{ path('app_trick_delete', {'slug': trick.slug}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer?')">Supprimer</a>
+                            <form method="post" action="{{ path('app_trick_delete', {'slug': trick.slug}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce trick?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ trick.slug) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                            </form>
                         {% endif %}
                     </div>
                 </div>

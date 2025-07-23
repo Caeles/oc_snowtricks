@@ -11,7 +11,8 @@
                     <h1 class="h3 mb-0">Modifier le trick</h1>
                 </div>
                 <div class="card-body">
-                    {{ form_start(form) }}
+                    <form id="edit-trick-form" method="post" action="{{ path('app_trick_edit', {'slug': trick.slug}) }}" enctype="multipart/form-data" >
+                    {{ form_widget(form._token) }}
                         <div class="mb-3">
                             {{ form_row(form.title) }}
                         </div>
@@ -83,13 +84,14 @@
                         </div>
                         
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="{{ path('app_trick_show', {'id': trick.id}) }}" class="btn btn-outline-secondary">Annuler</a>
-                            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                            <a href="{{ path('app_trick_show', {'slug': trick.slug}) }}" class="btn btn-outline-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary" id="save-btn">Enregistrer les modifications</button>
                         </div>
-                    {{ form_end(form) }}
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
 {% endblock %}

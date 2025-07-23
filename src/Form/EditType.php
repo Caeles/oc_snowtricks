@@ -38,6 +38,7 @@ class EditType extends AbstractType
                 'label' => 'URL de la vidéo',
                 'required' => false,
                 'mapped' => false,
+                'default_protocol' => 'https',
             ])
         ;
     }
