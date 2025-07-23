@@ -51,6 +51,7 @@ class AddTrickType extends AbstractType
                 'mapped' => false,
                 'multiple' => true, 
                 'constraints' => [
+                    // protection des  uploads de fichiers
                     new File([
                         'maxSize' => '5M',
                         'mimeTypes' => [

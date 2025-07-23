@@ -31,9 +31,9 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException('Trick non trouvé');
         }
         
-  
+  //récupération du numéro de page depuis la requête, 1 par défaut si pas de page
         $page = $request->query->getInt('page', 1);
-
+//lecture de 10 commentaires par page
         $commentData = $commentRepository->findCommentsByTrick($trick, $page, 10);
         
     
@@ -81,6 +81,9 @@ class TrickController extends AbstractController
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
                 $newFilename = md5(uniqid()) . '.' . $imageFile->guessExtension();
+                //sécurisation du nom des fichiers, uniqid() génère un identifiant unique aléatoire, md5() génère un hash md5 unique
+                //guessExtension() détermine l'extention sécurisée du fichier basé sur le type MIME
+                //évite les injections de fichiers et les risques de collision entre les noms de fichiers.
                 try {
                     $imageFile->move(
                         $this->getParameter('tricks_images_directory'),
@@ -136,7 +139,8 @@ class TrickController extends AbstractController
         
   
         if ($this->isCsrfTokenValid('delete'.$image->getId(), $request->request->get('_token'))) {
-            
+            //le  token empêche les attaques pour supprimer des fichiers,
+            // empêche la suppression non autorisée des images.
             $imagePath = $this->getParameter('tricks_images_directory').'/'.$image->getFilename();
             if (file_exists($imagePath)) {
                 unlink($imagePath);
@@ -163,7 +167,7 @@ class TrickController extends AbstractController
         $trick = $video->getTrick();
         $slug = $trick->getSlug();
         
-   
+//    Authentification et vérification des droits sur le trick
         if ($this->isCsrfTokenValid('delete'.$video->getId(), $request->request->get('_token'))) {
             $entityManager->remove($video);
             $entityManager->flush();

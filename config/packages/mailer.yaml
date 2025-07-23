@@ -3,3 +3,4 @@ framework:
         dsn: '%env(MAILER_DSN)%'
         headers:
             from: 'snowtricks@demomailtrap.co'
+# Utilisation de Mailtrap pour tester le mailer

@@ -24,10 +24,14 @@ security:
                 default_target_path: app_home
                 use_referer: true
                 enable_csrf: true
+                # activation de la protection CSRF pour le formulaire de connexion 
                 csrf_parameter: _csrf_token
                 csrf_token_id: authenticate
             logout:
                 path: logout
+                # activation de la protection CSRF pour le formulaire de déconnexion
+                csrf_parameter: _csrf_token
+                csrf_token_id: logout
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

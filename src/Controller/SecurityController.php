@@ -9,6 +9,7 @@ use App\Repository\ResetPasswordRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+//utilisation de l'algorithme de hachage de mot de passe
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +29,7 @@ final class SecurityController extends AbstractController
         $userForm = $this->createForm(UserType::class, $user);
         $userForm->handleRequest($request);
         if ($userForm->isSubmitted() && $userForm->isValid()) {
+            //hachage du mot de passe avec $passwordHasher
             $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
             
             try {
