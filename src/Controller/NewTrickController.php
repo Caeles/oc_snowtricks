@@ -17,7 +17,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 #[IsGranted('IS_AUTHENTICATED_FULLY')] //le formulaire n'est accessible que si l'utilisateur est authentifié
-//ForbiddenException
+                //ForbiddenException
 final class NewTrickController extends AbstractController
 {
     #[Route('/new/trick', name: 'app_new_trick')]

@@ -6,7 +6,8 @@ use App\Entity\Comment;
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 class CommentRepository extends ServiceEntityRepository
 {
@@ -16,24 +17,20 @@ class CommentRepository extends ServiceEntityRepository
     }
     
 
-    public function findCommentsByTrick(Trick $trick, int $page = 1, int $limit = 10): array
+    public function findCommentsByTrick(Trick $trick, int $page = 1, int $limit = 10): Pagerfanta
     {
-        $query = $this->createQueryBuilder('c')
+        $queryBuilder = $this->createQueryBuilder('c')
             ->andWhere('c.trick = :trick')
             ->setParameter('trick', $trick)
-            ->orderBy('c.createdAt', 'DESC')
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->getQuery();
+            ->orderBy('c.createdAt', 'DESC');
             
-        $paginator = new Paginator($query);
+        $adapter = new QueryAdapter($queryBuilder);
+        $pagerfanta = new Pagerfanta($adapter);
         
-        return [
-            'comments' => $paginator,
-            'totalComments' => count($paginator),
-            'totalPages' => ceil(count($paginator) / $limit),
-            'currentPage' => $page
-        ];
+        $pagerfanta->setMaxPerPage($limit);
+        $pagerfanta->setCurrentPage($page);
+        
+        return $pagerfanta;
     }
     
 

@@ -110,7 +110,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="h4 mb-0">Discussion ({{ totalComments }})</h2>
+                    <h2 class="h4 mb-0">Discussion ({{ pager.nbResults }})</h2>
                 </div>
                 <div class="card-body">
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
@@ -128,10 +128,9 @@
                         </div>
                     {% endif %}
 
-                    {% if comments|length > 0 %}
-                        <h3 class="h5 mb-4">{{ totalComments }} commentaire{% if totalComments > 1 %}s{% endif %}</h3>
-                        {# Pour chaque commentaire, le nom de l'auteur, la photo, la date de création du message et le message doivent être affichés. #}
-                        {% for comment in comments %}
+                    {% if pager.nbResults > 0 %}
+                        <h3 class="h5 mb-4">{{ pager.nbResults }} commentaire{% if pager.nbResults > 1 %}s{% endif %}</h3>
+                        {% for comment in pager %}
                             <div class="comment mb-4 p-3 border-bottom">
                                 <div class="d-flex">
                                     <div class="comment-author me-3">
@@ -154,12 +153,12 @@
                             </div>
                         {% endfor %}
 
-                        {% if totalPages > 1 %}
+                        {% if pager.haveToPaginate %}
                             <nav aria-label="Navigation commentaires">
                                 <ul class="pagination justify-content-center">
-                                    {% if currentPage > 1 %}
+                                    {% if pager.hasPreviousPage %}
                                         <li class="page-item">
-                                            <a class="page-link" href="{{ path('app_trick_show', {'slug': trick.slug, 'page': currentPage - 1}) }}">Précédent</a>
+                                            <a class="page-link" href="{{ path('app_trick_show', {'slug': trick.slug, 'page': pager.previousPage}) }}">Précédent</a>
                                         </li>
                                     {% else %}
                                         <li class="page-item disabled">
@@ -167,15 +166,40 @@
                                         </li>
                                     {% endif %}
 
-                                    {% for i in 1..totalPages %}
-                                        <li class="page-item {{ i == currentPage ? 'active' : '' }}">
+                                    {% set startPage = max(1, pager.currentPage - 2) %}
+                                    {% set endPage = min(pager.nbPages, pager.currentPage + 2) %}
+                                    
+                                    {% if startPage > 1 %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ path('app_trick_show', {'slug': trick.slug, 'page': 1}) }}">1</a>
+                                        </li>
+                                        {% if startPage > 2 %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                    
+                                    {% for i in startPage..endPage %}
+                                        <li class="page-item {{ i == pager.currentPage ? 'active' : '' }}">
                                             <a class="page-link" href="{{ path('app_trick_show', {'slug': trick.slug, 'page': i}) }}">{{ i }}</a>
                                         </li>
                                     {% endfor %}
-
-                                    {% if currentPage < totalPages %}
+                                    
+                                    {% if endPage < pager.nbPages %}
+                                        {% if endPage < pager.nbPages - 1 %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        {% endif %}
                                         <li class="page-item">
-                                            <a class="page-link" href="{{ path('app_trick_show', {'slug': trick.slug, 'page': currentPage + 1}) }}">Suivant</a>
+                                            <a class="page-link" href="{{ path('app_trick_show', {'slug': trick.slug, 'page': pager.nbPages}) }}">{{ pager.nbPages }}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if pager.hasNextPage %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ path('app_trick_show', {'slug': trick.slug, 'page': pager.nextPage}) }}">Suivant</a>
                                         </li>
                                     {% else %}
                                         <li class="page-item disabled">

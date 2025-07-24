@@ -31,10 +31,8 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException('Trick non trouvé');
         }
         
-//récupération du numéro de page depuis la requête, 1 par défaut si pas de page
-        $page = $request->query->getInt('page', 1);
-//lecture de 10 commentaires par page
-        $commentData = $commentRepository->findCommentsByTrick($trick, $page, 10);
+
+        $pagerfanta = $commentRepository->findCommentsByTrick($trick, $page, 10);
         
     
         $comment = new Comment();
@@ -57,10 +55,7 @@ class TrickController extends AbstractController
         return $this->render('trick/show.html.twig', [
             'trick' => $trick,
             'commentForm' => $form->createView(),
-            'comments' => $commentData['comments'],
-            'totalPages' => $commentData['totalPages'],
-            'currentPage' => $commentData['currentPage'],
-            'totalComments' => $commentData['totalComments']
+            'pager' => $pagerfanta
         ]);
     }
 
@@ -73,12 +68,11 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException('Trick non trouvé');
         }
 
-        //Symfony va récupérer les données du trick pour pré-remplir le formulaire
         $form = $this->createForm(EditType::class, $trick);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Ajouter un message flash pour confirmer la soumission du formulaire
+
             $this->addFlash('info', 'DEBUG: Formulaire soumis et valide'); 
             
             $imageFile = $form->get('imageFile')->getData();
@@ -120,14 +114,14 @@ class TrickController extends AbstractController
                 $entityManager->persist($video);
             }
             
-            // Assurons-nous que les modifications du trick sont persistées
+
             $entityManager->persist($trick);
             $entityManager->flush();
             
-            // Ajoutons un message de confirmation
+
             $this->addFlash('success', 'Les modifications ont été enregistrées avec succès');
 
-            // Redirigeons vers la page du trick
+
             return $this->redirectToRoute('app_trick_show', [
                 'slug' => $trick->getSlug(),
             ]);
@@ -147,8 +141,8 @@ class TrickController extends AbstractController
         
   
         if ($this->isCsrfTokenValid('delete'.$image->getId(), $request->request->get('_token'))) {
-            //le  token empêche les attaques pour supprimer des fichiers,
-            // empêche la suppression non autorisée des images.
+//le  token empêche les attaques pour supprimer des fichiers,
+// empêche la suppression non autorisée des images.
             $imagePath = $this->getParameter('tricks_images_directory').'/'.$image->getFilename();
             if (file_exists($imagePath)) {
                 unlink($imagePath);
@@ -175,7 +169,7 @@ class TrickController extends AbstractController
         $trick = $video->getTrick();
         $slug = $trick->getSlug();
         
-//    Authentification et vérification des droits sur le trick
+
         if ($this->isCsrfTokenValid('delete'.$video->getId(), $request->request->get('_token'))) {
             $entityManager->remove($video);
             $entityManager->flush();
