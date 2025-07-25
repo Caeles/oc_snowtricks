@@ -31,7 +31,7 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException('Trick non trouvé');
         }
         
-
+        $page = $request->query->getInt('page', 1);
         $pagerfanta = $commentRepository->findCommentsByTrick($trick, $page, 10);
         
     

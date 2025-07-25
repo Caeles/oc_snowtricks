@@ -45,18 +45,21 @@ final class SecurityController extends AbstractController
             return $this->redirectToRoute('signup');
         }
         
-        //hachage du mot de passe
         $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
         
         try {
-            // persister l'utilisateur
             $em->persist($user);
             $em->flush();
             
-            // envoi de l'email de bienvenue (sans bloquer l'inscription)
-            $this->sendWelcomeEmail($user, $mailer);
+  
+            $emailSent = $this->sendWelcomeEmail($user, $mailer);
             
-            $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+            if ($emailSent) {
+                $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter. Un email de bienvenue vous a été envoyé.');
+            } else {
+                $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                $this->addFlash('warning', 'Impossible d\'envoyer l\'email de bienvenue. Votre compte est néanmoins bien créé.');
+            }
             return $this->redirectToRoute('login');
             
         } catch (\PDOException $e) {
@@ -102,7 +105,7 @@ final class SecurityController extends AbstractController
         ]);
     }
 
-    private function sendWelcomeEmail(User $user, MailerInterface $mailer): void
+    private function sendWelcomeEmail(User $user, MailerInterface $mailer): bool
     {
         try {
             $email = new TemplatedEmail();
@@ -116,8 +119,11 @@ final class SecurityController extends AbstractController
                   ]);
             
             $mailer->send($email);
+            return true;
         } catch (\Exception $e) {
             
+            error_log('Erreur lors de l\'envoi de l\'email de bienvenue: ' . $e->getMessage());
+            return false;
         }
     }
 

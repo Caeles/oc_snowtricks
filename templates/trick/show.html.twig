@@ -4,9 +4,9 @@
 
 {% block body %}
 <section class="container mt-5">
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border shadow mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h1 class="h3 mb-0">{{ trick.title }}</h1>
                     <div>
@@ -76,7 +76,13 @@
                                     {% for video in trick.videos %}
                                         <div class="col-md-6 mb-3">
                                             <div class="ratio ratio-16x9">
-                                                <iframe src="{{ video.url }}" title="Vidéo" allowfullscreen></iframe>
+                                                {% if video.platform == 'youtube' %}
+                                                    <iframe src="{{ video.url|replace({'watch?v=': 'embed/'}) }}" title="Vidéo YouTube" allowfullscreen></iframe>
+                                                {% elseif video.platform == 'vimeo' %}
+                                                    <iframe src="{{ video.url|replace({'vimeo.com/': 'player.vimeo.com/video/'}) }}" title="Vidéo Vimeo" allowfullscreen></iframe>
+                                                {% else %}
+                                                    <iframe src="{{ video.url }}" title="Vidéo" allowfullscreen></iframe>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -99,16 +105,17 @@
         </div>
     </div>
     
-    <div class="row">
-        <div class="col-12">
-            <div class="d-grid gap-2">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-end mb-4">
                 <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">Retour à l'accueil</a>
             </div>
         </div>
     </div>
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card">
+    
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-10">
+            <div class="card border shadow">
                 <div class="card-header">
                     <h2 class="h4 mb-0">Discussion ({{ pager.nbResults }})</h2>
                 </div>
@@ -219,4 +226,14 @@
         </div>
     </div>
 </section>
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .card.border.shadow {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    }
+</style>
+{% endblock %}
 {% endblock %}
