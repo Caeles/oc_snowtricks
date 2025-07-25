@@ -9,6 +9,7 @@
 /vendor/
 .env*
 .DS_STORE
+.DS_Store
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
